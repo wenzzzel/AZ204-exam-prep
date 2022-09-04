@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Azure_durable_function_Chaining": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7101",
+      "launchBrowser": false
+    }
+  }
+}
