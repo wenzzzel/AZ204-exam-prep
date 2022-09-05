@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Azure_durable_function_Chaining
 {
-    public static class Function1
+    public static class ChainingFunction
     {
         [FunctionName("Function1")]
         public static async Task<List<string>> RunOrchestrator(
