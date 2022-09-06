@@ -20,9 +20,13 @@ namespace Azure_durable_function_Chaining
             [OrchestrationTrigger] IDurableOrchestrationContext context,
             ILogger log)
         {
+            log.LogInformation("starting orchestrator");
             var x = await context.CallActivityAsync<object>("Function1", 0);
+            log.LogInformation($"Function1 ran and x = {x}");
             var y = await context.CallActivityAsync<object>("Function2", x);
+            log.LogInformation($"Function2 ran and x = {y}");
             var z = await context.CallActivityAsync<object>("Function3", y);
+            log.LogInformation($"Function3 ran and x = {z}");
             return await context.CallActivityAsync<object>("Function4", z);
         }
 
