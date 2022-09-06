@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Azure_durable_function_Fan_out_fan_in": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7191",
+      "launchBrowser": false
+    }
+  }
+}
