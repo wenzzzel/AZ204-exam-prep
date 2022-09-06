@@ -16,18 +16,28 @@ namespace Azure_durable_function_Chaining
         
 
         [FunctionName("Chaining")]
-        public static async Task<object> RunOrchestrator(
+        public static async Task<int> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context,
             ILogger log)
         {
             log.LogInformation("starting orchestrator");
-            var x = await context.CallActivityAsync<object>("Function1", 0);
-            log.LogInformation($"Function1 ran and x = {x}");
-            var y = await context.CallActivityAsync<object>("Function2", x);
-            log.LogInformation($"Function2 ran and x = {y}");
-            var z = await context.CallActivityAsync<object>("Function3", y);
-            log.LogInformation($"Function3 ran and x = {z}");
-            return await context.CallActivityAsync<object>("Function4", z);
+
+            int myValue = 0;
+            log.LogInformation($"myValue = {myValue}");
+
+            myValue = await context.CallActivityAsync<int>("Function1", myValue);
+            log.LogInformation($"Function1 ran and myValue is now = {myValue}");
+
+            myValue = await context.CallActivityAsync<int>("Function2", myValue);
+            log.LogInformation($"Function2 ran and myValue is now = {myValue}");
+
+            myValue = await context.CallActivityAsync<int>("Function3", myValue);
+            log.LogInformation($"Function3 ran and myValue is now = {myValue}");
+
+            myValue = await context.CallActivityAsync<int>("Function4", myValue);
+            log.LogInformation($"Function4 ran and myValue is now = {myValue}");
+
+            return myValue;
         }
 
         [FunctionName("Function1")]
