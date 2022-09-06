@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Azure_durable_function_Fan_out_fan_in
 {
-    public static class Function1
+    public static class E2_BackupSiteContent
     {
-        [FunctionName("Function1")]
+        [FunctionName("E2_BackupSiteContent")]
         public static async Task<List<string>> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
