@@ -12,8 +12,15 @@ namespace Azure_durable_function_Chaining
 {
     public static class ChainingFunction
     {
+        /*
+         * NOTE: When running this chained durable function it will look like the same methods are run 
+         * multiple times, however they are not. It's just the logging that's being run multiple times
+         * but the actual awaited methods are only run once each.
+         *  
+         * https://stackoverflow.com/questions/52288577/azure-durable-orchestration-function-triggering-twice
+         * 
+         */
 
-        
 
         [FunctionName("Chaining")]
         public static async Task<int> RunOrchestrator(
