@@ -17,19 +17,13 @@ namespace Azure_durable_function_Chaining
 
         [FunctionName("Chaining")]
         public static async Task<object> RunOrchestrator(
-            [OrchestrationTrigger] IDurableOrchestrationContext context)
+            [OrchestrationTrigger] IDurableOrchestrationContext context,
+            ILogger log)
         {
-            //try
-            //{
-                var x = await context.CallActivityAsync<object>("Function1", 0);
-                var y = await context.CallActivityAsync<object>("Function2", x);
-                var z = await context.CallActivityAsync<object>("Function3", y);
-                return await context.CallActivityAsync<object>("Function4", z);
-            //}
-            //catch (Exception)
-            //{
-            //    return null;
-            //}
+            var x = await context.CallActivityAsync<object>("Function1", 0);
+            var y = await context.CallActivityAsync<object>("Function2", x);
+            var z = await context.CallActivityAsync<object>("Function3", y);
+            return await context.CallActivityAsync<object>("Function4", z);
         }
 
         [FunctionName("Function1")]
