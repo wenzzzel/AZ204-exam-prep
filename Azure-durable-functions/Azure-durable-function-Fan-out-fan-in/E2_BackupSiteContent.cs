@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -63,6 +64,11 @@ namespace Azure_durable_function_Fan_out_fan_in
 
             string fileName = filePath.Split('\\').Last();
             string outputLocation = @$"C:/copyTo/{fileName}";
+
+            //Throwing exception to learn how state is tracked in Durable Functions
+            if (fileName == "myTest - Copy (4).txt")
+                throw new Exception();
+            //...
 
             log.LogInformation($"Copying '{filePath}' to '{outputLocation}'. Total bytes = {byteCount}.");
 
