@@ -6,7 +6,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.Blob;
 
 
 namespace Azure_durable_function_Fan_out_fan_in
@@ -17,7 +16,7 @@ namespace Azure_durable_function_Fan_out_fan_in
         public static async Task<long> Run(
             [OrchestrationTrigger] IDurableOrchestrationContext backupContext)
         {
-            string rootDirectory = backupContext.GetInput<string>()?.Trim();
+            string rootDirectory = @"C:\copyFrom\";
             if (string.IsNullOrEmpty(rootDirectory))
             {
                 rootDirectory = Directory.GetParent(typeof(E2_BackupSiteContent).Assembly.Location).FullName;
@@ -47,6 +46,7 @@ namespace Azure_durable_function_Fan_out_fan_in
             ILogger log)
         {
             log.LogInformation($"Searching for files under '{rootDirectory}'...");
+
             string[] files = Directory.GetFiles(rootDirectory, "*", SearchOption.AllDirectories);
             log.LogInformation($"Found {files.Length} file(s) under {rootDirectory}.");
 
@@ -61,18 +61,14 @@ namespace Azure_durable_function_Fan_out_fan_in
         {
             long byteCount = new FileInfo(filePath).Length;
 
-            // strip the drive letter prefix and convert to forward slashes
-            string blobPath = filePath
-                .Substring(Path.GetPathRoot(filePath).Length)
-                .Replace('\\', '/');
-            string outputLocation = $"backups/{blobPath}";
+            string fileName = filePath.Split('\\').Last();
+            string outputLocation = @$"C:/copyTo/{fileName}";
 
             log.LogInformation($"Copying '{filePath}' to '{outputLocation}'. Total bytes = {byteCount}.");
 
-            // copy the file contents into a blob
+            // copy the file contents to another location
             using (Stream source = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (Stream destination = await binder.BindAsync<CloudBlobStream>(
-                new BlobAttribute(outputLocation, FileAccess.Write)))
+            using (Stream destination = new FileStream(outputLocation, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 await source.CopyToAsync(destination);
             }
