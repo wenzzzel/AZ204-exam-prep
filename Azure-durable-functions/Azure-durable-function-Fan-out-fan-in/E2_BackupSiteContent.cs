@@ -88,8 +88,15 @@ namespace Azure_durable_function_Fan_out_fan_in
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-            // Function input comes from the request content.
+            
+            // Use this part to run as you would do normally
             string instanceId = await starter.StartNewAsync("E2_BackupSiteContent", null);
+            // ...
+
+            // Use this part to rewind an earlier failed orchestration
+            //await starter.RewindAsync("b4a7cc16cc2544c995257d118b0c6075", "Testing rewind");
+            //string instanceId = "";
+            // ...
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
