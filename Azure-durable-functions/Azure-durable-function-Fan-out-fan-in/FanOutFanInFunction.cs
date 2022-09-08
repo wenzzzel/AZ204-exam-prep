@@ -11,27 +11,27 @@ using Microsoft.Extensions.Logging;
 
 namespace Azure_durable_function_Fan_out_fan_in
 {
-    public static class E2_BackupSiteContent
+    public static class FanOutFanInFunction
     {
-        [FunctionName("E2_BackupSiteContent")]
+        [FunctionName("FanOutFanInFunction")]
         public static async Task<long> Run(
             [OrchestrationTrigger] IDurableOrchestrationContext backupContext)
         {
             string rootDirectory = @"C:\copyFrom\";
             if (string.IsNullOrEmpty(rootDirectory))
             {
-                rootDirectory = Directory.GetParent(typeof(E2_BackupSiteContent).Assembly.Location).FullName;
+                rootDirectory = Directory.GetParent(typeof(FanOutFanInFunction).Assembly.Location).FullName;
             }
 
             string[] files = await backupContext.CallActivityAsync<string[]>(
-                "E2_GetFileList",
+                "GetFileList",
                 rootDirectory);
 
             var tasks = new Task<long>[files.Length];
             for (int i = 0; i < files.Length; i++)
             {
                 tasks[i] = backupContext.CallActivityAsync<long>(
-                    "E2_CopyFileToBlob",
+                    "CopyFileToBlob",
                     files[i]);
             }
 
@@ -41,7 +41,7 @@ namespace Azure_durable_function_Fan_out_fan_in
             return totalBytes;
         }
 
-        [FunctionName("E2_GetFileList")]
+        [FunctionName("GetFileList")]
         public static string[] GetFileList(
             [ActivityTrigger] string rootDirectory,
             ILogger log)
@@ -54,7 +54,7 @@ namespace Azure_durable_function_Fan_out_fan_in
             return files;
         }
 
-        [FunctionName("E2_CopyFileToBlob")]
+        [FunctionName("CopyFileToBlob")]
         public static async Task<long> CopyFileToBlob(
             [ActivityTrigger] string filePath,
             Binder binder,
@@ -82,7 +82,7 @@ namespace Azure_durable_function_Fan_out_fan_in
             return byteCount;
         }
 
-        [FunctionName("E2_BackupSiteContent_HttpStart")]
+        [FunctionName("FanOutFanInFunction_HttpStart")]
         public static async Task<HttpResponseMessage> HttpStart(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
             [DurableClient] IDurableOrchestrationClient starter,
