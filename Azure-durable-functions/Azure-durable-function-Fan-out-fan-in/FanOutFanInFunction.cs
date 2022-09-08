@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 
 namespace Azure_durable_function_Fan_out_fan_in
@@ -105,7 +106,8 @@ namespace Azure_durable_function_Fan_out_fan_in
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-            string instanceId = "b4a7cc16cc2544c995257d118b0c6075";
+            string instanceId = req.Headers.GetValues("InstanceId").First();
+
             await starter.RewindAsync(instanceId, "Testing rewind");
 
             log.LogInformation($"Started rewind of instance '{instanceId}'.");
