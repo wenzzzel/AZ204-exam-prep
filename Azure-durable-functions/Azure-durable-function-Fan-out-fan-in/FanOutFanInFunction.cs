@@ -92,17 +92,23 @@ namespace Azure_durable_function_Fan_out_fan_in
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
-            
-            // Use this part to run as you would do normally
             string instanceId = await starter.StartNewAsync("FanOutFanInFunction", null);
-            // ...
-
-            // Use this part to rewind an earlier failed orchestration
-            //await starter.RewindAsync("b4a7cc16cc2544c995257d118b0c6075", "Testing rewind");
-            //string instanceId = "";
-            // ...
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+
+            return starter.CreateCheckStatusResponse(req, instanceId);
+        }
+
+        [FunctionName("FanOutFanInFunction_HttpStartRewinding")]
+        public static async Task<HttpResponseMessage> HttpStartRewinding(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
+            [DurableClient] IDurableOrchestrationClient starter,
+            ILogger log)
+        {
+            string instanceId = "b4a7cc16cc2544c995257d118b0c6075";
+            await starter.RewindAsync(instanceId, "Testing rewind");
+
+            log.LogInformation($"Started rewind of instance '{instanceId}'.");
 
             return starter.CreateCheckStatusResponse(req, instanceId);
         }
