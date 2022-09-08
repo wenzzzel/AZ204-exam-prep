@@ -82,6 +82,10 @@ namespace Azure_durable_function_Fan_out_fan_in
             return byteCount;
         }
 
+        /*****************************************************
+         * ONLY EXTERNALLY EXPOSED TRIGGERS BELOW THIS POINT *
+         *****************************************************/
+
         [FunctionName("FanOutFanInFunction_HttpStart")]
         public static async Task<HttpResponseMessage> HttpStart(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
