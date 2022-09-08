@@ -94,7 +94,7 @@ namespace Azure_durable_function_Fan_out_fan_in
         {
             
             // Use this part to run as you would do normally
-            string instanceId = await starter.StartNewAsync("E2_BackupSiteContent", null);
+            string instanceId = await starter.StartNewAsync("FanOutFanInFunction", null);
             // ...
 
             // Use this part to rewind an earlier failed orchestration
