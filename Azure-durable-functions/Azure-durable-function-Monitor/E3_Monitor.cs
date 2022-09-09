@@ -19,8 +19,6 @@ namespace Azure_durable_function_Monitor
             MonitorRequest input = monitorContext.GetInput<MonitorRequest>();
             if (!monitorContext.IsReplaying) { log.LogInformation($"Received monitor request. Location: {input?.Location}. Phone: {input?.Phone}."); }
 
-            VerifyRequest(input);
-
             DateTime endTime = monitorContext.CurrentUtcDateTime.AddHours(6);
             if (!monitorContext.IsReplaying) { log.LogInformation($"Instantiating monitor for {input.Location}. Expires: {endTime}."); }
 
@@ -50,25 +48,6 @@ namespace Azure_durable_function_Monitor
             }
 
             log.LogInformation($"Monitor expiring.");
-        }
-
-        [Deterministic]
-        private static void VerifyRequest(MonitorRequest request)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request), "An input object is required.");
-            }
-
-            if (request.Location == null)
-            {
-                throw new ArgumentNullException(nameof(request.Location), "A location input is required.");
-            }
-
-            if (string.IsNullOrEmpty(request.Phone))
-            {
-                throw new ArgumentNullException(nameof(request.Phone), "A phone number input is required.");
-            }
         }
 
         [FunctionName("E3_GetIsClear")]
