@@ -63,12 +63,9 @@ namespace Azure_durable_function_Monitor
         [FunctionName("E3_SendGoodWeatherAlert")]
         public static void SendGoodWeatherAlert(
             [ActivityTrigger] string phoneNumber,
-            ILogger log,
-            [TwilioSms(AccountSidSetting = "TwilioAccountSid", AuthTokenSetting = "TwilioAuthToken", From = "%TwilioPhoneNumber%")]
-                out CreateMessageOptions message)
+            ILogger log)
         {
-            message = new CreateMessageOptions(new PhoneNumber(phoneNumber));
-            message.Body = $"The weather's clear outside! Go take a walk!";
+            log.LogInformation("Running E3_SendGoodWeatherAlert");
         }
     }
 }
