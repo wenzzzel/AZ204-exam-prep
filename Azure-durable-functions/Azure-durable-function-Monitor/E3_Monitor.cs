@@ -77,5 +77,16 @@ namespace Azure_durable_function_Monitor
             var currentConditions = await WeatherUnderground.GetCurrentConditionsAsync(location);
             return currentConditions.Equals(WeatherCondition.Clear);
         }
+
+        [FunctionName("E3_SendGoodWeatherAlert")]
+        public static void SendGoodWeatherAlert(
+            [ActivityTrigger] string phoneNumber,
+            ILogger log,
+            [TwilioSms(AccountSidSetting = "TwilioAccountSid", AuthTokenSetting = "TwilioAuthToken", From = "%TwilioPhoneNumber%")]
+                out CreateMessageOptions message)
+        {
+            message = new CreateMessageOptions(new PhoneNumber(phoneNumber));
+            message.Body = $"The weather's clear outside! Go take a walk!";
+        }
     }
 }
