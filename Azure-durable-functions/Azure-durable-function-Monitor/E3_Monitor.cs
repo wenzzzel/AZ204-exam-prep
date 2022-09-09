@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Azure_durable_function_Monitor
 {
-    public static class Function1
+    public static class E3_Monitor
     {
         [FunctionName("E3_Monitor")]
         public static async Task Run([OrchestrationTrigger] IDurableOrchestrationContext monitorContext, ILogger log)
