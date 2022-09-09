@@ -70,5 +70,12 @@ namespace Azure_durable_function_Monitor
                 throw new ArgumentNullException(nameof(request.Phone), "A phone number input is required.");
             }
         }
+
+        [FunctionName("E3_GetIsClear")]
+        public static async Task<bool> GetIsClear([ActivityTrigger] Location location)
+        {
+            var currentConditions = await WeatherUnderground.GetCurrentConditionsAsync(location);
+            return currentConditions.Equals(WeatherCondition.Clear);
+        }
     }
 }
