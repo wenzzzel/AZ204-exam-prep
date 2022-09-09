@@ -11,40 +11,62 @@ namespace Azure_durable_function_Monitor
 {
     public static class Function1
     {
-        [FunctionName("Function1")]
-        public static async Task<List<string>> RunOrchestrator(
-            [OrchestrationTrigger] IDurableOrchestrationContext context)
+        [FunctionName("E3_Monitor")]
+        public static async Task Run([OrchestrationTrigger] IDurableOrchestrationContext monitorContext, ILogger log)
         {
-            var outputs = new List<string>();
+            MonitorRequest input = monitorContext.GetInput<MonitorRequest>();
+            if (!monitorContext.IsReplaying) { log.LogInformation($"Received monitor request. Location: {input?.Location}. Phone: {input?.Phone}."); }
 
-            // Replace "hello" with the name of your Durable Activity Function.
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "Tokyo"));
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "Seattle"));
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "London"));
+            VerifyRequest(input);
 
-            // returns ["Hello Tokyo!", "Hello Seattle!", "Hello London!"]
-            return outputs;
+            DateTime endTime = monitorContext.CurrentUtcDateTime.AddHours(6);
+            if (!monitorContext.IsReplaying) { log.LogInformation($"Instantiating monitor for {input.Location}. Expires: {endTime}."); }
+
+            while (monitorContext.CurrentUtcDateTime < endTime)
+            {
+                // Check the weather
+                if (!monitorContext.IsReplaying) { log.LogInformation($"Checking current weather conditions for {input.Location} at {monitorContext.CurrentUtcDateTime}."); }
+
+                bool isClear = await monitorContext.CallActivityAsync<bool>("E3_GetIsClear", input.Location);
+
+                if (isClear)
+                {
+                    // It's not raining! Or snowing. Or misting. Tell our user to take advantage of it.
+                    if (!monitorContext.IsReplaying) { log.LogInformation($"Detected clear weather for {input.Location}. Notifying {input.Phone}."); }
+
+                    await monitorContext.CallActivityAsync("E3_SendGoodWeatherAlert", input.Phone);
+                    break;
+                }
+                else
+                {
+                    // Wait for the next checkpoint
+                    var nextCheckpoint = monitorContext.CurrentUtcDateTime.AddMinutes(30);
+                    if (!monitorContext.IsReplaying) { log.LogInformation($"Next check for {input.Location} at {nextCheckpoint}."); }
+
+                    await monitorContext.CreateTimer(nextCheckpoint, CancellationToken.None);
+                }
+            }
+
+            log.LogInformation($"Monitor expiring.");
         }
 
-        [FunctionName("Function1_Hello")]
-        public static string SayHello([ActivityTrigger] string name, ILogger log)
+        [Deterministic]
+        private static void VerifyRequest(MonitorRequest request)
         {
-            log.LogInformation($"Saying hello to {name}.");
-            return $"Hello {name}!";
-        }
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "An input object is required.");
+            }
 
-        [FunctionName("Function1_HttpStart")]
-        public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
-            [DurableClient] IDurableOrchestrationClient starter,
-            ILogger log)
-        {
-            // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("Function1", null);
+            if (request.Location == null)
+            {
+                throw new ArgumentNullException(nameof(request.Location), "A location input is required.");
+            }
 
-            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
-
-            return starter.CreateCheckStatusResponse(req, instanceId);
+            if (string.IsNullOrEmpty(request.Phone))
+            {
+                throw new ArgumentNullException(nameof(request.Phone), "A phone number input is required.");
+            }
         }
     }
 }
