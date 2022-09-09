@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Azure_durable_function_Monitor": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7066",
+      "launchBrowser": false
+    }
+  }
+}
