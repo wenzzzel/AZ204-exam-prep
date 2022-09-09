@@ -51,10 +51,13 @@ namespace Azure_durable_function_Monitor
         }
 
         [FunctionName("E3_GetIsClear")]
-        public static async Task<bool> GetIsClear([ActivityTrigger] Location location)
+        public static async Task<bool> GetIsClear([ActivityTrigger] string asdfg)
         {
-            var currentConditions = await WeatherUnderground.GetCurrentConditionsAsync(location);
-            return currentConditions.Equals(WeatherCondition.Clear);
+            // Making this random for testing purposes
+            if(new Random().Next() % 2 == 0)
+                return true;
+            else
+                return false;
         }
 
         [FunctionName("E3_SendGoodWeatherAlert")]
