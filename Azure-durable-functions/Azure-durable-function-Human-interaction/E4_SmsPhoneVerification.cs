@@ -18,6 +18,9 @@ namespace Azure_durable_function_Human_interaction
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             string phoneNumber = context.GetInput<string>();
+            // Hardcodnig phone number for simplicity
+            phoneNumber = "1234567890";
+
             if (string.IsNullOrEmpty(phoneNumber))
             {
                 throw new ArgumentNullException(
