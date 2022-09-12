@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Azure_durable_function_Aggregator_stateful_entities
 {
-    public static class Function1
+    public static class Counter
     {
         [FunctionName("Function1")]
         public static async Task<List<string>> RunOrchestrator(
