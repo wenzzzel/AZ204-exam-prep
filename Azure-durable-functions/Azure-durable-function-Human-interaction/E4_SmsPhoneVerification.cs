@@ -89,5 +89,19 @@ namespace Azure_durable_function_Human_interaction
 
             return challengeCode;
         }
+
+
+        [FunctionName("E4_HttpStart")]
+        public static async Task<HttpResponseMessage> HttpStart(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
+        [DurableClient] IDurableOrchestrationClient starter,
+        ILogger log)
+        {
+            string instanceId = await starter.StartNewAsync("E4_SmsPhoneVerification", null);
+
+            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+
+            return starter.CreateCheckStatusResponse(req, instanceId);
+        }
     }
 }
