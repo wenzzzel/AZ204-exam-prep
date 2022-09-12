@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -36,8 +37,9 @@ namespace Azure_durable_function_Aggregator_stateful_entities
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
             [DurableClient] IDurableEntityClient entityClient)
         {
-            var metricType = (string)eventData.Properties["metric"];
-            var delta = BitConverter.ToInt32(eventData.Body, eventData.Body.Offset);
+            var metricType = "add";
+            byte[] myByteArray = new byte[] { 0x20, 0x20, 0x20 };
+            var delta = BitConverter.ToInt32(myByteArray, 0);
 
             // The "Counter/{metricType}" entity is created on-demand.
             var entityId = new EntityId("Counter", metricType);
