@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Azure_durable_function_Aggregator_stateful_entities": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7190",
+      "launchBrowser": false
+    }
+  }
+}
