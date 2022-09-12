@@ -67,5 +67,24 @@ namespace Azure_durable_function_Human_interaction
                 return authorized;
             }
         }
+
+        [FunctionName("E4_SendSmsChallenge")]
+        public static int SendSmsChallenge(
+            [ActivityTrigger] string phoneNumber,
+            ILogger log,
+            [TwilioSms(AccountSidSetting = "TwilioAccountSid", AuthTokenSetting = "TwilioAuthToken", From = "%TwilioPhoneNumber%")]
+            out CreateMessageOptions message)
+        {
+            // Get a random number generator with a random seed (not time-based)
+            var rand = new Random(Guid.NewGuid().GetHashCode());
+            int challengeCode = rand.Next(10000);
+
+            log.LogInformation($"Sending verification code {challengeCode} to {phoneNumber}.");
+
+            message = new CreateMessageOptions(new PhoneNumber(phoneNumber));
+            message.Body = $"Your verification code is {challengeCode:0000}";
+
+            return challengeCode;
+        }
     }
 }
