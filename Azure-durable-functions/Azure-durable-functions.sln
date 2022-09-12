@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure-durable-function-Chai
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure-durable-function-Fan-out-fan-in", "Azure-durable-function-Fan-out-fan-in\Azure-durable-function-Fan-out-fan-in.csproj", "{8078122C-6987-43A0-8D5E-EF6674F890E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure-durable-function-Async-HTTP-APIs", "Azure-durable-function-Async-HTTP-APIs\Azure-durable-function-Async-HTTP-APIs.csproj", "{B695911E-45E6-4B83-ADD1-1DCADB2431E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure-durable-function-Async-HTTP-APIs", "Azure-durable-function-Async-HTTP-APIs\Azure-durable-function-Async-HTTP-APIs.csproj", "{B695911E-45E6-4B83-ADD1-1DCADB2431E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure-durable-function-Monitor", "Azure-durable-function-Monitor\Azure-durable-function-Monitor.csproj", "{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{B695911E-45E6-4B83-ADD1-1DCADB2431E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B695911E-45E6-4B83-ADD1-1DCADB2431E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B695911E-45E6-4B83-ADD1-1DCADB2431E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
