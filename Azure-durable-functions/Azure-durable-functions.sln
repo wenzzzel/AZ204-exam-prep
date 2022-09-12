@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure-durable-function-Fan-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure-durable-function-Async-HTTP-APIs", "Azure-durable-function-Async-HTTP-APIs\Azure-durable-function-Async-HTTP-APIs.csproj", "{B695911E-45E6-4B83-ADD1-1DCADB2431E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure-durable-function-Monitor", "Azure-durable-function-Monitor\Azure-durable-function-Monitor.csproj", "{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure-durable-function-Monitor", "Azure-durable-function-Monitor\Azure-durable-function-Monitor.csproj", "{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure-durable-function-Human-interaction", "Azure-durable-function-Human-interaction\Azure-durable-function-Human-interaction.csproj", "{AF31A162-ED9E-43FB-AAED-E003903779F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EDC0F7D-2D5D-4452-A4B2-5CD8F6BDC1B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF31A162-ED9E-43FB-AAED-E003903779F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF31A162-ED9E-43FB-AAED-E003903779F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF31A162-ED9E-43FB-AAED-E003903779F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF31A162-ED9E-43FB-AAED-E003903779F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
