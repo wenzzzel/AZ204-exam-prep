@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -12,39 +14,58 @@ namespace Azure_durable_function_Human_interaction
     public static class E4_SmsPhoneVerification
     {
         [FunctionName("E4_SmsPhoneVerification")]
-        public static async Task<List<string>> RunOrchestrator(
-            [OrchestrationTrigger] IDurableOrchestrationContext context)
+        public static async Task<bool> Run(
+    [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
-            var outputs = new List<string>();
+            string phoneNumber = context.GetInput<string>();
+            if (string.IsNullOrEmpty(phoneNumber))
+            {
+                throw new ArgumentNullException(
+                    nameof(phoneNumber),
+                    "A phone number input is required.");
+            }
 
-            // Replace "hello" with the name of your Durable Activity Function.
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "Tokyo"));
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "Seattle"));
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "London"));
+            int challengeCode = await context.CallActivityAsync<int>(
+                "E4_SendSmsChallenge",
+                phoneNumber);
 
-            // returns ["Hello Tokyo!", "Hello Seattle!", "Hello London!"]
-            return outputs;
-        }
+            using (var timeoutCts = new CancellationTokenSource())
+            {
+                // The user has 90 seconds to respond with the code they received in the SMS message.
+                DateTime expiration = context.CurrentUtcDateTime.AddSeconds(90);
+                Task timeoutTask = context.CreateTimer(expiration, timeoutCts.Token);
 
-        [FunctionName("Function1_Hello")]
-        public static string SayHello([ActivityTrigger] string name, ILogger log)
-        {
-            log.LogInformation($"Saying hello to {name}.");
-            return $"Hello {name}!";
-        }
+                bool authorized = false;
+                for (int retryCount = 0; retryCount <= 3; retryCount++)
+                {
+                    Task<int> challengeResponseTask =
+                        context.WaitForExternalEvent<int>("SmsChallengeResponse");
 
-        [FunctionName("Function1_HttpStart")]
-        public static async Task<HttpResponseMessage> HttpStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
-            [DurableClient] IDurableOrchestrationClient starter,
-            ILogger log)
-        {
-            // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("Function1", null);
+                    Task winner = await Task.WhenAny(challengeResponseTask, timeoutTask);
+                    if (winner == challengeResponseTask)
+                    {
+                        // We got back a response! Compare it to the challenge code.
+                        if (challengeResponseTask.Result == challengeCode)
+                        {
+                            authorized = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // Timeout expired
+                        break;
+                    }
+                }
 
-            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+                if (!timeoutTask.IsCompleted)
+                {
+                    // All pending timers must be complete or canceled before the function exits.
+                    timeoutCts.Cancel();
+                }
 
-            return starter.CreateCheckStatusResponse(req, instanceId);
+                return authorized;
+            }
         }
     }
 }
