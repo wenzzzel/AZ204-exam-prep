@@ -16,32 +16,31 @@ namespace Azure_durable_function_Monitor
         [FunctionName("E3_Monitor")]
         public static async Task Run([OrchestrationTrigger] IDurableOrchestrationContext monitorContext, ILogger log)
         {
-            MonitorRequest input = monitorContext.GetInput<MonitorRequest>();
-            if (!monitorContext.IsReplaying) { log.LogInformation($"Received monitor request. Location: {input?.Location}. Phone: {input?.Phone}."); }
+            if (!monitorContext.IsReplaying) { log.LogInformation($"Received monitor request."); }
 
             DateTime endTime = monitorContext.CurrentUtcDateTime.AddHours(6);
-            if (!monitorContext.IsReplaying) { log.LogInformation($"Instantiating monitor for {input.Location}. Expires: {endTime}."); }
+            if (!monitorContext.IsReplaying) { log.LogInformation($"Instantiating monitor. Expires: {endTime}."); }
 
             while (monitorContext.CurrentUtcDateTime < endTime)
             {
                 // Check the weather
-                if (!monitorContext.IsReplaying) { log.LogInformation($"Checking current weather conditions for {input.Location} at {monitorContext.CurrentUtcDateTime}."); }
+                if (!monitorContext.IsReplaying) { log.LogInformation($"Checking current weather conditions at {monitorContext.CurrentUtcDateTime}."); }
 
-                bool isClear = await monitorContext.CallActivityAsync<bool>("E3_GetIsClear", input.Location);
+                bool isClear = await monitorContext.CallActivityAsync<bool>("E3_GetIsClear", "");
 
                 if (isClear)
                 {
                     // It's not raining! Or snowing. Or misting. Tell our user to take advantage of it.
-                    if (!monitorContext.IsReplaying) { log.LogInformation($"Detected clear weather for {input.Location}. Notifying {input.Phone}."); }
+                    if (!monitorContext.IsReplaying) { log.LogInformation($"Detected clear weather. Notifying."); }
 
-                    await monitorContext.CallActivityAsync("E3_SendGoodWeatherAlert", input.Phone);
+                    await monitorContext.CallActivityAsync("E3_SendGoodWeatherAlert", "");
                     break;
                 }
                 else
                 {
                     // Wait for the next checkpoint
-                    var nextCheckpoint = monitorContext.CurrentUtcDateTime.AddMinutes(30);
-                    if (!monitorContext.IsReplaying) { log.LogInformation($"Next check for {input.Location} at {nextCheckpoint}."); }
+                    var nextCheckpoint = monitorContext.CurrentUtcDateTime.AddMinutes(2);
+                    if (!monitorContext.IsReplaying) { log.LogInformation($"Next check at {nextCheckpoint}."); }
 
                     await monitorContext.CreateTimer(nextCheckpoint, CancellationToken.None);
                 }
@@ -62,10 +61,23 @@ namespace Azure_durable_function_Monitor
 
         [FunctionName("E3_SendGoodWeatherAlert")]
         public static void SendGoodWeatherAlert(
-            [ActivityTrigger] string phoneNumber,
+            [ActivityTrigger] string asdf,
             ILogger log)
         {
             log.LogInformation("Running E3_SendGoodWeatherAlert");
+        }
+
+        [FunctionName("E3_HttpStart")]
+        public static async Task<HttpResponseMessage> HttpStart(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
+        [DurableClient] IDurableOrchestrationClient starter,
+        ILogger log)
+        {
+            string instanceId = await starter.StartNewAsync("E3_Monitor", null);
+
+            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+
+            return starter.CreateCheckStatusResponse(req, instanceId);
         }
     }
 }
