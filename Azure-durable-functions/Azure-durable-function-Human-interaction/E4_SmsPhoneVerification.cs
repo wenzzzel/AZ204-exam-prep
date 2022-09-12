@@ -15,7 +15,7 @@ namespace Azure_durable_function_Human_interaction
     {
         [FunctionName("E4_SmsPhoneVerification")]
         public static async Task<bool> Run(
-    [OrchestrationTrigger] IDurableOrchestrationContext context)
+            [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             string phoneNumber = context.GetInput<string>();
             if (string.IsNullOrEmpty(phoneNumber))
