@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Azure_durable_function_Human_interaction
 {
-    public static class Function1
+    public static class E4_SmsPhoneVerification
     {
-        [FunctionName("Function1")]
+        [FunctionName("E4_SmsPhoneVerification")]
         public static async Task<List<string>> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
