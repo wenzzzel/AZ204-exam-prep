@@ -6,45 +6,58 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Azure_durable_function_Aggregator_stateful_entities
 {
     public static class Function1
     {
-        [FunctionName("Function1")]
-        public static async Task<List<string>> RunOrchestrator(
-            [OrchestrationTrigger] IDurableOrchestrationContext context)
+        [FunctionName("Counter")]
+        public static void Counter([EntityTrigger] IDurableEntityContext ctx)
         {
-            var outputs = new List<string>();
-
-            // Replace "hello" with the name of your Durable Activity Function.
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "Tokyo"));
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "Seattle"));
-            outputs.Add(await context.CallActivityAsync<string>("Function1_Hello", "London"));
-
-            // returns ["Hello Tokyo!", "Hello Seattle!", "Hello London!"]
-            return outputs;
+            int currentValue = ctx.GetState<int>();
+            switch (ctx.OperationName.ToLowerInvariant())
+            {
+                case "add":
+                    int amount = ctx.GetInput<int>();
+                    ctx.SetState(currentValue + amount);
+                    break;
+                case "reset":
+                    ctx.SetState(0);
+                    break;
+                case "get":
+                    ctx.Return(currentValue);
+                    break;
+            }
         }
 
-        [FunctionName("Function1_Hello")]
-        public static string SayHello([ActivityTrigger] string name, ILogger log)
-        {
-            log.LogInformation($"Saying hello to {name}.");
-            return $"Hello {name}!";
-        }
-
-        [FunctionName("Function1_HttpStart")]
+        [FunctionName("HttpStart")]
         public static async Task<HttpResponseMessage> HttpStart(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
-            [DurableClient] IDurableOrchestrationClient starter,
-            ILogger log)
+            [DurableClient] IDurableEntityClient entityClient)
         {
-            // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("Function1", null);
+            var metricType = (string)eventData.Properties["metric"];
+            var delta = BitConverter.ToInt32(eventData.Body, eventData.Body.Offset);
 
-            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
-
-            return starter.CreateCheckStatusResponse(req, instanceId);
+            // The "Counter/{metricType}" entity is created on-demand.
+            var entityId = new EntityId("Counter", metricType);
+            await entityClient.SignalEntityAsync(entityId, "add", delta);
         }
+
+    }
+    public class Counter
+    {
+        [JsonProperty("value")]
+        public int CurrentValue { get; set; }
+
+        public void Add(int amount) => this.CurrentValue += amount;
+
+        public void Reset() => this.CurrentValue = 0;
+
+        public int Get() => this.CurrentValue;
+
+        [FunctionName(nameof(Counter))]
+        public static Task Run([EntityTrigger] IDurableEntityContext ctx)
+            => ctx.DispatchAsync<Counter>();
     }
 }
