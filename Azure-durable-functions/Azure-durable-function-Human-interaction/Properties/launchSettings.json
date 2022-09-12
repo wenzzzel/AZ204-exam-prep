@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Azure_durable_function_Human_interaction": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7067",
+      "launchBrowser": false
+    }
+  }
+}
