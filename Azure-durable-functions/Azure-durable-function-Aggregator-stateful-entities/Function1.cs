@@ -23,7 +23,8 @@ namespace Azure_durable_function_Aggregator_stateful_entities
             switch (ctx.OperationName.ToLowerInvariant())
             {
                 case "add":
-                    int amount = ctx.GetInput<int>();
+                    //int amount = ctx.GetInput<int>();
+                    int amount = 1;
                     ctx.SetState(currentValue + amount);
                     break;
                 case "reset":
@@ -36,12 +37,13 @@ namespace Azure_durable_function_Aggregator_stateful_entities
         }
 
         [FunctionName("HttpStart")]
-        public static async Task Run(
+        public static async Task<EntityStateResponse<int>> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
-            [DurableClient] IDurableEntityClient entityClient)
+            [DurableClient] IDurableEntityClient entityClient,
+            ILogger log)
         {
             string metricType;
-            int random = new Random().Next(0, 2);
+            int random = new Random().Next(0, 3);
             switch (random)
             {
                 case 0:
@@ -58,9 +60,13 @@ namespace Azure_durable_function_Aggregator_stateful_entities
                     break;
             }
 
+            log.LogInformation($"metricType set to {metricType}");
+
             // The "Counter/{metricType}" entity is created on-demand.
             var entityId = new EntityId("Counter", metricType);
             await entityClient.SignalEntityAsync(entityId, metricType);
+
+            return await entityClient.ReadEntityStateAsync<int>(entityId, "get");
         }
 
     }
