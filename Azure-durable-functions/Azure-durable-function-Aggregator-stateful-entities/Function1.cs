@@ -33,7 +33,7 @@ namespace Azure_durable_function_Aggregator_stateful_entities
         }
 
         [FunctionName("HttpStart")]
-        public static async Task<HttpResponseMessage> HttpStart(
+        public static async Task Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
             [DurableClient] IDurableEntityClient entityClient)
         {
