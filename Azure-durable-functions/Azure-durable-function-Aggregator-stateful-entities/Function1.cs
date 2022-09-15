@@ -13,9 +13,12 @@ namespace Azure_durable_function_Aggregator_stateful_entities
 {
     public static class Function1
     {
-        [FunctionName("Counter")]
-        public static void Counter([EntityTrigger] IDurableEntityContext ctx)
+        [FunctionName("Function1")]
+        public static void Counter([EntityTrigger] IDurableEntityContext ctx,
+            ILogger log)
         {
+            log.LogInformation("DurableEntity triggered!");
+
             int currentValue = ctx.GetState<int>();
             switch (ctx.OperationName.ToLowerInvariant())
             {
@@ -38,12 +41,10 @@ namespace Azure_durable_function_Aggregator_stateful_entities
             [DurableClient] IDurableEntityClient entityClient)
         {
             var metricType = "add";
-            byte[] myByteArray = new byte[] { 0x20, 0x20, 0x20 };
-            var delta = BitConverter.ToInt32(myByteArray, 0);
 
             // The "Counter/{metricType}" entity is created on-demand.
             var entityId = new EntityId("Counter", metricType);
-            await entityClient.SignalEntityAsync(entityId, "add", delta);
+            await entityClient.SignalEntityAsync(entityId, "add");
         }
 
     }
