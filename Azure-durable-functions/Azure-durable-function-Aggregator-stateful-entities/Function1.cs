@@ -40,11 +40,27 @@ namespace Azure_durable_function_Aggregator_stateful_entities
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
             [DurableClient] IDurableEntityClient entityClient)
         {
-            var metricType = "add";
+            string metricType;
+            int random = new Random().Next(0, 2);
+            switch (random)
+            {
+                case 0:
+                    metricType = "add";
+                    break;
+                case 1:
+                    metricType = "reset";
+                    break;
+                case 2:
+                    metricType = "get";
+                    break;
+                default:
+                    metricType = "add";
+                    break;
+            }
 
             // The "Counter/{metricType}" entity is created on-demand.
             var entityId = new EntityId("Counter", metricType);
-            await entityClient.SignalEntityAsync(entityId, "add");
+            await entityClient.SignalEntityAsync(entityId, metricType);
         }
 
     }
