@@ -37,7 +37,7 @@ namespace Azure_durable_function_Aggregator_stateful_entities
         }
 
         [FunctionName("HttpStart")]
-        public static async Task<EntityStateResponse<int>> Run(
+        public static async Task<EntityStateResponse<Counter>> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequestMessage req,
             [DurableClient] IDurableEntityClient entityClient,
             ILogger log)
@@ -66,7 +66,7 @@ namespace Azure_durable_function_Aggregator_stateful_entities
             var entityId = new EntityId("Counter", metricType);
             await entityClient.SignalEntityAsync(entityId, metricType);
 
-            return await entityClient.ReadEntityStateAsync<int>(entityId, "get");
+            return await entityClient.ReadEntityStateAsync<Counter>(entityId);
         }
 
     }
