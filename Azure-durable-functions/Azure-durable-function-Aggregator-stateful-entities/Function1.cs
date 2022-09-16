@@ -17,8 +17,6 @@ namespace Azure_durable_function_Aggregator_stateful_entities
         public static void Counter([EntityTrigger] IDurableEntityContext ctx,
             ILogger log)
         {
-            log.LogInformation("DurableEntity triggered!");
-
             int currentValue = ctx.GetState<int>();
             switch (ctx.OperationName.ToLowerInvariant())
             {
@@ -64,7 +62,7 @@ namespace Azure_durable_function_Aggregator_stateful_entities
 
             // The "Counter/{metricType}" entity is created on-demand.
             var entityId = new EntityId("Counter", metricType);
-            await entityClient.SignalEntityAsync(entityId, metricType);
+            await entityClient.SignalEntityAsync(entityId, "add");
 
             return await entityClient.ReadEntityStateAsync<Counter>(entityId);
         }
